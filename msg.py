@@ -23,7 +23,6 @@ class MessagePassing(nn.Module):
         self.f = layers.Transformation(in_feats, num_hids, out_feats)
         self.g = layers.Transformation(out_feats, num_hids, out_feats)
 
-
     def forward(self, in_vec, adj_mat):
         x = self.f(in_vec)  # map features to hidden space
 
