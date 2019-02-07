@@ -4,10 +4,10 @@ import layers
 
 
 class MessagePassing(nn.Module):
-    def __init__(self, in_feats, num_hids, out_feats, num_steps):
+    def __init__(self, in_feats, n_hids, out_feats, num_steps):
         '''
         in_feats: number of input features
-        num_hids: number of hidden neurons (a list)
+        n_hids: number of hidden neurons (a list)
         out_feats: number of output features
 
         f maps *all* raw feature vectors to size out_feats
@@ -20,8 +20,8 @@ class MessagePassing(nn.Module):
 
         self.num_steps = num_steps
 
-        self.f = layers.Transformation(in_feats, num_hids, out_feats)
-        self.g = layers.Transformation(out_feats, num_hids, out_feats)
+        self.f = layers.Transformation(in_feats, n_hids, out_feats)
+        self.g = layers.Transformation(out_feats, n_hids, out_feats)
 
     def forward(self, in_vec, adj_mat):
         x = self.f(in_vec)  # map features to hidden space

@@ -6,21 +6,21 @@ from torch.nn.parameter import Parameter
 
 
 class Transformation(nn.Module):
-    def __init__(self, in_feats, num_hids, out_feats):
+    def __init__(self, in_feats, n_hids, out_feats):
         '''
         in_feats: number of input features
-        num_hids: number of hidden neurons (a list)
+        n_hids: number of hidden neurons (a list)
         out_feats: number of output features
         '''
         super(Transformation, self).__init__()
 
         self.in_feats = in_feats
-        self.num_hids = num_hids
+        self.n_hids = n_hids
         self.out_feats = out_feats
 
         # parameter dimensions
         layers = [self.in_feats]
-        layers.extend(self.num_hids)
+        layers.extend(self.n_hids)
         layers.append(self.out_feats)
 
         self.weights = []
@@ -56,5 +56,5 @@ class Transformation(nn.Module):
     def __repr__(self):
         return self.__class__.__name__ + ' (' \
                + str(self.in_feats) + ' -> ' \
-               + ' -> '.join(str(i) for i in self.num_hids) \
+               + ' -> '.join(str(i) for i in self.n_hids) \
                + ' -> ' + str(self.out_feats) + ')'
