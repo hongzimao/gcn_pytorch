@@ -64,7 +64,7 @@ class GCN(nn.Module):
         right_node_embeddings = self.k2(torch.spmm(node_mat_2, node_embeddings))
         edge_embeddings = left_node_embeddings + right_node_embeddings
         if edge_feats is not None:
-            edge_embeddings += self.l(edge_feats)
+            edge_embeddings = edge_embeddings + self.l(edge_feats)
 
         # map to edge outputs
         edge_outputs = self.q(edge_embeddings)

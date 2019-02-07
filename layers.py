@@ -52,7 +52,7 @@ class Transformation(nn.Module):
         x = in_vec
         for l in range(len(self.weights)):
             x = torch.mm(x, self.weights[l])
-            x += self.biases[l]
+            x = x + self.biases[l]
             x = self.act(x)
         return x
 

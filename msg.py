@@ -29,6 +29,6 @@ class MessagePassing(nn.Module):
         for s in range(self.num_steps):
             ne = torch.mm(adj_mat, x)  # message passing
             ne = self.g(ne)
-            x += ne
+            x = x + ne
 
         return x
