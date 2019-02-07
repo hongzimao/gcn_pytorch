@@ -31,6 +31,9 @@ class Transformation(nn.Module):
             self.biases.append(Parameter(torch.FloatTensor(
                 layers[l + 1])))
 
+        self.weights = nn.ParameterList(self.weights)
+        self.biases = nn.ParameterList(self.biases)
+
         # relu activation function
         self.act = F.relu
 
