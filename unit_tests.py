@@ -1,4 +1,5 @@
 import unittest
+import numpy as np
 import torch
 import layers
 import msg
@@ -110,8 +111,93 @@ class TestGCN(unittest.TestCase):
 
 # -------------------------------------------------------------------------
 
-# class TestTrainGCN(unittest.TestCase):
-    # TODO
+class TestTrainGCN(unittest.TestCase):
+
+    def test_node_output(self):
+        seed = 4
+        n_hids = [16]
+        n_iters = 500
+
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+
+        graph_cnn = gcn.GCN(2, 0, 1, 0, 2, n_hids, 1)
+        graph_cnn.train()
+        optimizer = torch.optim.Adam(graph_cnn.parameters(), lr=1e-2)
+
+        losses = []
+        for _ in range(n_iters):
+
+            node_feats_np = np.random.rand(3, 2)
+            adj_mat_np = np.array([[0, 1, 1],
+                                   [1, 0, 0],
+                                   [1, 0, 0]])
+            edges = [(0, 1), (0, 2), (1, 0), (2, 0)]
+
+            node_feats = torch.FloatTensor(node_feats_np)
+            adj_mat = torch.FloatTensor(adj_mat_np)
+
+            node_output, edge_output = graph_cnn(node_feats, adj_mat, edges, None)
+
+            true_node_output = torch.FloatTensor(
+                np.sum(adj_mat_np.dot(node_feats_np), axis=1, keepdims=True))
+
+            loss = torch.sum((true_node_output - node_output) ** 2)
+            losses.append(loss)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+        # < 5% error
+        self.assertTrue(bool(losses[0] > 0.5))
+        self.assertTrue(bool((sum(losses[-10:]) / 10) < 0.05))
+
+    def test_edge_ouotput(self):
+        seed = 4
+        n_hids = [16]
+        n_iters = 500
+
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+
+        graph_cnn = gcn.GCN(2, 2, 0, 1, 2, n_hids, 1)
+        graph_cnn.train()
+        optimizer = torch.optim.Adam(graph_cnn.parameters(), lr=1e-2)
+
+        losses = []
+        for _ in range(n_iters):
+
+            node_feats_np = np.random.rand(3, 2)
+            adj_mat_np = np.array([[0, 1, 1],
+                                   [1, 0, 0],
+                                   [1, 0, 0]])
+            edges = [(0, 1), (0, 2), (1, 0), (2, 0)]
+
+            node_feats = torch.FloatTensor(node_feats_np)
+            adj_mat = torch.FloatTensor(adj_mat_np)
+
+            node_output, edge_output = graph_cnn(node_feats, adj_mat, edges, None)
+
+            # left and right node contributes differently
+            true_edge_output_np = np.array([2 * node_feats_np[0, :] + node_feats_np[1, :],
+                                            2 * node_feats_np[0, :] + node_feats_np[2, :],
+                                            2 * node_feats_np[1, :] + node_feats_np[0, :],
+                                            2 * node_feats_np[2, :] + node_feats_np[0, :]])
+
+            true_edge_output_np = np.sum(true_edge_output_np, axis=1, keepdims=True)
+            true_edge_output = torch.FloatTensor(true_edge_output_np)
+
+            loss = torch.sum((true_edge_output - edge_output) ** 2)
+            losses.append(loss)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+        # < 5% error
+        self.assertTrue(bool(losses[0] > 0.5))
+        self.assertTrue(bool((sum(losses[-10:]) / 10) < 0.05))
 
 # -------------------------------------------------------------------------
 
