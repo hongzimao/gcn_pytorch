@@ -180,10 +180,11 @@ class TestTrainGCN(unittest.TestCase):
             node_output, edge_output = graph_cnn(node_feats, adj_mat, edges, None)
 
             # left and right node contributes differently
-            true_edge_output_np = np.array([2 * node_feats_np[0, :] + node_feats_np[1, :],
-                                            2 * node_feats_np[0, :] + node_feats_np[2, :],
-                                            2 * node_feats_np[1, :] + node_feats_np[0, :],
-                                            2 * node_feats_np[2, :] + node_feats_np[0, :]])
+            true_edge_output_np = np.array(
+                [2 * node_feats_np[0, :] + node_feats_np[1, :],
+                 2 * node_feats_np[0, :] + node_feats_np[2, :],
+                 2 * node_feats_np[1, :] + node_feats_np[0, :],
+                 2 * node_feats_np[2, :] + node_feats_np[0, :]])
 
             true_edge_output_np = np.sum(true_edge_output_np, axis=1, keepdims=True)
             true_edge_output = torch.FloatTensor(true_edge_output_np)
