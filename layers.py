@@ -6,7 +6,7 @@ from torch.nn.parameter import Parameter
 
 
 class Transformation(nn.Module):
-    def __init__(self, in_feats, n_hids, out_feats):
+    def __init__(self, in_feats, n_hids, out_feats, layer_norm_on=False):
         '''
         in_feats: number of input features
         n_hids: number of hidden neurons (a list)
@@ -17,6 +17,7 @@ class Transformation(nn.Module):
         self.in_feats = in_feats
         self.n_hids = n_hids
         self.out_feats = out_feats
+        self.layer_norm_on = layer_norm_on
 
         # parameter dimensions
         layers = [self.in_feats]
@@ -25,11 +26,14 @@ class Transformation(nn.Module):
 
         self.weights = []
         self.biases = []
+        self.layer_norms = []
         for l in range(len(layers) - 1):
             self.weights.append(Parameter(torch.FloatTensor(
                 layers[l], layers[l + 1])))
             self.biases.append(Parameter(torch.FloatTensor(
                 layers[l + 1])))
+            if self.layer_norm_on:
+                self.layer_norms.append(nn.LayerNorm(layers[l + 1]))
 
         self.weights = nn.ParameterList(self.weights)
         self.biases = nn.ParameterList(self.biases)
@@ -54,6 +58,8 @@ class Transformation(nn.Module):
             x = torch.mm(x, self.weights[l])
             x = x + self.biases[l]
             x = self.act(x)
+            if self.layer_norm_on:
+                x = self.layer_norms[l](x)
         return x
 
     def __repr__(self):
