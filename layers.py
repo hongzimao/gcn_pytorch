@@ -6,7 +6,8 @@ from torch.nn.parameter import Parameter
 
 
 class Transformation(nn.Module):
-    def __init__(self, in_feats, n_hids, out_feats, layer_norm_on=False):
+    def __init__(self, in_feats, n_hids, out_feats,
+                 act=F.leaky_relu, layer_norm_on=False):
         '''
         in_feats: number of input features
         n_hids: number of hidden neurons (a list)
@@ -39,7 +40,7 @@ class Transformation(nn.Module):
         self.biases = nn.ParameterList(self.biases)
 
         # relu activation function
-        self.act = F.relu
+        self.act = act
 
         # initialize parameters
         self.reset()

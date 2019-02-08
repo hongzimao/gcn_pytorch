@@ -3,13 +3,15 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import layers
 import msg
 
 
 class GCN(nn.Module):
     def __init__(self, n_feats, e_feats, n_output, e_output,
-                 h_size, n_hids, n_steps):
+                 h_size, n_hids, n_steps,
+                 act=F.leaky_relu, layer_norm_on=False):
         '''
         n_feats: number of node features
         e_feats: number of edge features
@@ -36,12 +38,18 @@ class GCN(nn.Module):
 
         super(GCN, self).__init__()
 
-        self.msg = msg.MessagePassing(n_feats, n_hids, h_size, n_steps)
-        self.h = layers.Transformation(h_size, n_hids, n_output)
-        self.k1 = layers.Transformation(h_size, n_hids, h_size)
-        self.k2 = layers.Transformation(h_size, n_hids, h_size)
-        self.l = layers.Transformation(e_feats, n_hids, h_size)
-        self.q = layers.Transformation(h_size, n_hids, e_output)
+        self.msg = msg.MessagePassing(
+            n_feats, n_hids, h_size, n_steps, act, layer_norm_on)
+        self.h = layers.Transformation(
+            h_size, n_hids, n_output, act, layer_norm_on)
+        self.k1 = layers.Transformation(
+            h_size, n_hids, h_size, act, layer_norm_on)
+        self.k2 = layers.Transformation(
+            h_size, n_hids, h_size, act, layer_norm_on)
+        self.l = layers.Transformation(
+            e_feats, n_hids, h_size, act, layer_norm_on)
+        self.q = layers.Transformation(
+            h_size, n_hids, e_output, act, layer_norm_on)
 
     def forward(self, node_feats, adj_mat, edges, edge_feats):
         '''

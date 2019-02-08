@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 import torch
+import torch.nn.functional as F
 import layers
 import msg
 import gcn
@@ -19,7 +20,7 @@ class TestTransformation(unittest.TestCase):
             torch.eq(in_vec, out_vec))))
 
     def test_known_transformation(self):
-        f = layers.Transformation(2, [2], 2)
+        f = layers.Transformation(2, [2], 2, act=F.relu)
         f.weights[0].data = torch.FloatTensor([[1, 2], [-3, -4]])
         f.weights[1].data = torch.FloatTensor([[-5, 6], [-7, 8]])
         f.biases[0].data = torch.FloatTensor([-2, 1])
@@ -39,7 +40,7 @@ class TestTransformation(unittest.TestCase):
         in_vec = torch.FloatTensor([[1, 2]])
         out_vec = f(in_vec)
         self.assertTrue(bool(torch.all(torch.eq(out_vec,
-            torch.FloatTensor([[0, 0]])))))
+            torch.FloatTensor([[-0.01, -0.02]])))))
 
 # -------------------------------------------------------------------------
 
@@ -75,7 +76,7 @@ class TestMessagePassing(unittest.TestCase):
 class TestGCN(unittest.TestCase):
 
     def test_identity_sum_features(self):
-        graph_cnn = gcn.GCN(2, 2, 2, 2, 2, [2], 1)
+        graph_cnn = gcn.GCN(2, 2, 2, 2, 2, [2], 1, act=F.relu)
         eye_weights(graph_cnn.msg.f)
         eye_weights(graph_cnn.msg.g)
         eye_weights(graph_cnn.h)
