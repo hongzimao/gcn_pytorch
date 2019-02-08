@@ -115,7 +115,7 @@ class TestGCN(unittest.TestCase):
 class TestTrainGCN(unittest.TestCase):
 
     def test_node_output(self):
-        seed = 4
+        seed = 42
         n_hids = [16]
         n_iters = 500
 
@@ -155,7 +155,7 @@ class TestTrainGCN(unittest.TestCase):
         self.assertTrue(bool((sum(losses[-10:]) / 10) < 0.05))
 
     def test_edge_ouotput(self):
-        seed = 4
+        seed = 42
         n_hids = [16]
         n_iters = 500
 
