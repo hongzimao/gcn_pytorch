@@ -6,8 +6,8 @@ from torch.nn.parameter import Parameter
 
 
 class Transformation(nn.Module):
-    def __init__(self, in_feats, n_hids, out_feats,
-                 act=F.leaky_relu, layer_norm_on=False):
+    def __init__(self, in_feats, n_hids, out_feats, act=F.leaky_relu,
+                 layer_norm_on=False, final_layer_act=True):
         '''
         in_feats: number of input features
         n_hids: number of hidden neurons (a list)
@@ -19,6 +19,7 @@ class Transformation(nn.Module):
         self.n_hids = n_hids
         self.out_feats = out_feats
         self.layer_norm_on = layer_norm_on
+        self.final_layer_act = final_layer_act
 
         # parameter dimensions
         layers = [self.in_feats]
@@ -58,7 +59,8 @@ class Transformation(nn.Module):
         for l in range(len(self.weights)):
             x = torch.mm(x, self.weights[l])
             x = x + self.biases[l]
-            x = self.act(x)
+            if l < len(self.weights) - 1 or self.final_layer_act:
+                x = self.act(x)
             if self.layer_norm_on:
                 x = self.layer_norms[l](x)
         return x
